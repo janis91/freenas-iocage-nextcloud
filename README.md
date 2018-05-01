@@ -19,17 +19,24 @@ Although not required, it's recommended to create two datasets on your main stor
 ### Installation
 Download the repository to a convenient directory on your FreeNAS system by running `git clone https://github.com/danb35/freenas-iocage-nextcloud`.  Then change into the new directory and create a file called `nextcloud-config`.  It should look like this:
 ```
-JAIL_IP="192.168.1.199"
+JAIL_IP="192.168.1.199" #ip address of iocage jail
 DEFAULT_GW_IP="192.168.1.1"
 INTERFACE="igb0"
 VNET="off"
-POOL_PATH="/mnt/tank"
-JAIL_NAME="nextcloud"
+POOL_PATH="/mnt/v1" #your pool
+JAIL_NAME="nextcloud" #name of iocage jail to be created
 TIME_ZONE="America/New_York" # See http://php.net/manual/en/timezones.php
 HOST_NAME="YOUR_FQDN"
 STANDALONE_CERT=0
 DNS_CERT=0
 TEST_CERT="--test"
+C_NAME="US"
+ST_NAME="yourstate"
+L_NAME="yourcity"
+O_NAME="FreeNAS"
+OU_NAME="FreeNAS_IT"
+EMAIL_NAME="youremail@gmail.com"
+
 ```
 Many of the options are self-explanatory, and all should be adjusted to suit your needs.  JAIL_IP and DEFAULT_GW_IP are the IP address and default gateway, respectively, for your jail.  INTERFACE is the network interface that your FreeNAS server is actually using.  If you have multiple interfaces, run `ifconfig` and see which one has an IP address, and enter that one here. If you want to use a virtual non-shared IP, pick a unused name as your interface and set VNET to ''on''  POOL_PATH is the path for your data pool, on which the Nextcloud user data and MariaDB database will be stored.  JAIL_NAME is the name of the jail, and wouldn't ordinarily need to be changed.  If you don't specify it in nextcloud-config, JAIL_NAME will default to "nextcloud".  TIME_ZONE is the time zone of your location, as PHP sees it--see the [PHP manual](http://php.net/manual/en/timezones.php) for a list of all valid time zones.
 
