@@ -169,9 +169,7 @@ iocage exec ${JAIL_NAME} chmod -R 770 /mnt/files
 #iocage exec ${JAIL_NAME} "if [ -z /usr/ports ]; then portsnap fetch extract; else portsnap auto; fi"
 #iocage exec ${JAIL_NAME} chsh -s /usr/local/bin/bash root
 iocage exec ${JAIL_NAME} fetch -o /tmp https://download.nextcloud.com/server/releases/latest.tar.bz2
-#iocage exec ${JAIL_NAME} fetch -o /tmp https://download.nextcloud.com/server/releases/latest-12.tar.bz2
 iocage exec ${JAIL_NAME} tar xjf /tmp/latest.tar.bz2 -C /usr/local/www/
-#iocage exec ${JAIL_NAME} tar xjf /tmp/latest-12.tar.bz2 -C /usr/local/www/
 iocage exec ${JAIL_NAME} rm /tmp/latest.tar.bz2
 iocage exec ${JAIL_NAME} chown -R www:www /usr/local/www/nextcloud/
 iocage exec ${JAIL_NAME} sysrc nginx_enable="YES"
@@ -187,7 +185,7 @@ iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=
 
 echo "before copy ssl directory"
 # Copy and edit pre-written config files
-#iocage exec ${JAIL_NAME} pkg install openssl -y
+
 iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/nginx/ssl/
 echo "make directory /usr/local/etc/nginx/ssl/"
 iocage exec ${JAIL_NAME} -- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /usr/local/etc/nginx/ssl/nginx-selfsigned.key -out /usr/local/etc/nginx/ssl/nginx-selfsigned.crt -subj "/C=${C_NAME}/ST=$P{ST_NAME}/L=${L_NAME}/O=${O_NAME}/OU={OU_NAME}/CN={HOST_NAME}"
@@ -203,7 +201,7 @@ iocage exec ${JAIL_NAME} sed -i '' "s/yourhostnamehere/${HOST_NAME}/" /usr/local
 iocage exec ${JAIL_NAME} sed -i '' "s/youripaddress/${JAIL_IP}/" /usr/local/etc/nginx/nginx.conf
 #iocage exec ${JAIL_NAME} sed -i '' "s/#skip-networking/skip-networking/" /var/db/mysql/my.cnf
 #iocage exec ${JAIL_NAME} sed -i '' "s|mytimezone|${TIME_ZONE}|" /usr/local/etc/php.ini
-# iocage exec ${JAIL_NAME} openssl dhparam -out /usr/local/etc/pki/tls/private/dhparams_4096.pem 4096
+#iocage exec ${JAIL_NAME} openssl dhparam -out /usr/local/etc/pki/tls/private/dhparams_4096.pem 4096
 iocage restart ${JAIL_NAME}
 
 #iocage exec ${JAIL_NAME} -- certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
