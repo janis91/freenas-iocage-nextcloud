@@ -18,7 +18,7 @@ cp -R iocage/iocage/lib/ /usr/local/lib/python3.6/site-packages/iocage/lib
 Although not required, it's recommended to create two datasets on your main storage pool: one named `files`, which will store the Nextcloud user data; and one called `db`, which will store the MariaDB database.  For optimal performance, set the record size of the `db` dataset to 16 KB (under Advanced Settings).
 
 ### Installation
-Download the repository to a convenient directory on your FreeNAS system by running `git clone https://github.com/danb35/freenas-iocage-nextcloud`.  Then change into the new directory and create a file called `nextcloud-config`.  It should look like this:
+Download the repository to a convenient directory on your FreeNAS system by running `git clone https://github.com/NasKar2/freenas-iocage-nextcloud.git`.  Then change into the new directory and create a file called `nextcloud-config`.  It should look like this:
 ```
 JAIL_IP="192.168.1.199" #ip address of iocage jail
 DEFAULT_GW_IP="192.168.1.1"
@@ -51,7 +51,7 @@ It's also helpful if HOST_NAME resolves to your jail from **inside** your networ
 To automate the generation of an openssl certificate add the options for C_NAME your country of origin, ST_NAME your state, L_NAME your city, O_name is your orgainization, OU_NAME is your department, and finally EMAIL_NAME is your email address.
 
 ### Execution
-Once you've downloaded the script, prepared the configuration file, and (if applicable) made the necessary edits to `configs/acme_dns_issue.sh`, run this script (`./nextcloud-jail.sh`).  The script will run for several minutes.  When it finishes, your jail will be created, Nextcloud will be installed and configured, and you'll be shown the randomly-generated password for the default user ("admin").  You can then log in and create users, add data, and generally do whatever else you like.
+Once you've downloaded the script, prepared the configuration file, run this script (`./nextcloud-jail.sh`).  The script will run for several minutes.  When it finishes, your jail will be created, Nextcloud will be installed and configured, and you'll be shown the randomly-generated password for the default user ("admin").  You can then log in and create users, add data, and generally do whatever else you like. After nextcloud is up and running you can run the xtra script ('./xtra.sh') which will enable the memory cache, Redis and bunch of file previews.
 
 ### To Do
 This script has been tested on a few different systems, obtaining the cert in both DNS and Standalone mode, and everything seems to be working properly.  Further testing is, of course, always appreciated.
