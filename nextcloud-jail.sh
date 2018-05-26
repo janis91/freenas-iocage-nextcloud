@@ -187,6 +187,11 @@ iocage exec ${JAIL_NAME} 'echo 'DEFAULT_VERSIONS+=ssl=openssl' >> /etc/make.conf
 iocage exec ${JAIL_NAME} make -C /usr/ports/databases/pecl-redis clean install BATCH=yes
 iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=yes
 
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/certs/
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
+#iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
+#iocage exec ${JAIL_NAME} chmod 600 /usr/local/etc/pki/tls/private/privkey.pem
+
 #iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
 #iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
 #iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
