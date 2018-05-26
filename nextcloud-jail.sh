@@ -1,7 +1,6 @@
 #!/bin/sh
 # Build an iocage jail under FreeNAS 11.1 using the current release of Nextcloud 13
-# Forked from https://github.com/danb35/freenas-iocage-nextcloud
-# https://github.com/NasKar2/freenas-iocage-nextcloud
+# https://github.com/danb35/freenas-iocage-nextcloud
 
 # Check for root privileges
 if ! [ $(id -u) = 0 ]; then
@@ -23,7 +22,7 @@ FILES_PATH=""
 PORTS_PATH=""
 STANDALONE_CERT=0
 DNS_CERT=0
-TEST_CERT="--staging"
+TEST_CERT="--test"
 C_NAME="US"
 ST_NAME=""
 L_NAME=""
@@ -83,10 +82,10 @@ fi
 
 # If DB_PATH, FILES_PATH, and PORTS_PATH weren't set in nextcloud-config, set them
 if [ -z $DB_PATH ]; then
-  DB_PATH="${POOL_PATH}/db7"
+  DB_PATH="${POOL_PATH}/db"
 fi
 if [ -z $FILES_PATH ]; then
-  FILES_PATH="${POOL_PATH}/files7"
+  FILES_PATH="${POOL_PATH}/files"
 fi
 if [ -z $PORTS_PATH ]; then
   PORTS_PATH="${POOL_PATH}/portsnap"
@@ -144,9 +143,9 @@ echo 'Configuration error: OU_NAME must be set'
 exit 1
 fi
 
-#echo '{"pkgs":["nano","openssl","py27-certbot","nginx","mariadb101-server","redis","php70-bz2","php70-ctype","php70-curl","php70-dom","php70-exif","php70-fileinfo","php70-filter","php70-gd","php70-hash","php70-iconv","php70-intl","php70-json","php70-mbstring","php70-mcrypt","php70-pdo_mysql","php70-openssl","php70-posix","php70-session","php70-simplexml","php70-xml","php70-xmlreader","php70-xmlwriter","php70-xsl","php70-wddx","php70-zip","php70-zlib","php70-opcache"]}' > /tmp/pkg.json
+#echo '{"pkgs":["nano","openssl","py27-certbot","nginx","mariadb100-server","redis","php70-bz2","php70-ctype","php70-curl","php70-dom","php70-exif","php70-fileinfo","php70-filter","php70-gd","php70-hash","php70-iconv","php70-intl","php70-json","php70-mbstring","php70-mcrypt","php70-pdo_mysql","php70-openssl","php70-posix","php70-session","php70-simplexml","php70-xml","php70-xmlreader","php70-xmlwriter","php70-xsl","php70-wddx","php70-zip","php70-zlib","php70-opcache"]}' > /tmp/pkg.json
 
-echo '{"pkgs":["nano","openssl","curl","sudo","php72-phar","py27-certbot","nginx","mariadb101-server","redis","php72-ctype","php72-dom","php72-gd","php72-iconv","php72-json","php72-mbstring","php72-posix","php72-simplexml","","php72-xmlreader","php72-xmlwriter","php72-zip","php72-zlib","php72-pdo_mysql","php72-hash","php72-xml","php72-session","php72-mysqli","php72-wddx","php72-xsl","php72-filter","php72-curl","php72-fileinfo","php72-bz2","php72-intl","php72-openssl","php72-ldap","php72-ftp","php72-imap","php72-exif","php72-gmp","php72-memcache","php72-opcache","php72-pcntl","php72","mod_php72","bash","p5-Locale-gettext","help2man","texinfo","m4","autoconf","socat","git"]}' > /tmp/pkg.json
+echo '{"pkgs":["nano","openssl","curl","sudo","php72-phar","py27-certbot","nginx","mariadb102-server","redis","php72-ctype","php72-dom","php72-gd","php72-iconv","php72-json","php72-mbstring","php72-posix","php72-simplexml","","php72-xmlreader","php72-xmlwriter","php72-zip","php72-zlib","php72-pdo_mysql","php72-hash","php72-xml","php72-session","php72-mysqli","php72-wddx","php72-xsl","php72-filter","php72-curl","php72-fileinfo","php72-bz2","php72-intl","php72-openssl","php72-ldap","php72-ftp","php72-imap","php72-exif","php72-gmp","php72-memcache","php72-opcache","php72-pcntl","php72","mod_php72","bash","p5-Locale-gettext","help2man","texinfo","m4","autoconf","socat","git"]}' > /tmp/pkg.json
 iocage create --name "${JAIL_NAME}" -p /tmp/pkg.json -r 11.1-RELEASE ip4_addr="${INTERFACE}|${JAIL_IP}/24" defaultrouter="${DEFAULT_GW_IP}" boot="on" host_hostname="${JAIL_NAME}" vnet="${VNET}"
 
 rm /tmp/pkg.json
@@ -157,6 +156,7 @@ mkdir -p ${FILES_PATH}
 chown -R 80:80 ${FILES_PATH}
 mkdir -p ${PORTS_PATH}/ports
 mkdir -p ${PORTS_PATH}/db
+mkdir -p ${POOL_PATH}/NextcloudBackups
 iocage exec ${JAIL_NAME} mkdir -p /mnt/files
 iocage exec ${JAIL_NAME} mkdir -p /var/db/mysql
 iocage exec ${JAIL_NAME} mkdir -p /mnt/configs
@@ -165,11 +165,9 @@ iocage fstab -a ${JAIL_NAME} ${PORTS_PATH}/db /var/db/portsnap nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${FILES_PATH} /mnt/files nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${DB_PATH} /var/db/mysql  nullfs  rw  0  0
 iocage fstab -a ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
-
-# add ${POOL_PATH}/media to jail so you can use external storage to access your media files
-#iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/media /mnt/media nullfs rw 0 0
-#echo ${POOL_PATH}/media 
-
+iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/media /mnt/media nullfs rw 0 0
+iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/NextcloudBackups /mnt/NextcloudBackups nullfs rw 0 0
+echo ${POOL_PATH}/media 
 iocage exec ${JAIL_NAME} chown -R www:www /mnt/files
 iocage exec ${JAIL_NAME} chmod -R 770 /mnt/files
 iocage exec ${JAIL_NAME} "if [ -z /usr/ports ]; then portsnap fetch extract; else portsnap auto; fi"
@@ -185,11 +183,34 @@ iocage exec ${JAIL_NAME} sysrc php_fpm_enable="YES"
 iocage exec ${JAIL_NAME} -- mkdir -p /usr/local/etc/nginx/ssl/
 
 iocage exec ${JAIL_NAME} 'echo 'DEFAULT_VERSIONS+=ssl=openssl' >> /etc/make.conf'
+#iocage exec ${JAIL_NAME} portsnap fetch extract
 iocage exec ${JAIL_NAME} make -C /usr/ports/databases/pecl-redis clean install BATCH=yes
 iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=yes
 
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/certs/
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
+#iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
+#iocage exec ${JAIL_NAME} chmod 600 /usr/local/etc/pki/tls/private/privkey.pem
 
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
+#iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
+#iocage exec ${JAIL_NAME} chmod 600 /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
+#iocage exec ${JAIL_NAME} curl https://get.acme.sh -o /tmp/get-acme.sh
+#iocage exec ${JAIL_NAME} sh /tmp/get-acme.sh
+#iocage exec ${JAIL_NAME} rm /tmp/get-acme.sh
+  
+# Issue certificate.  If standalone mode is selected, issue directly, otherwise call external script to issue cert via DNS validation
+#if [ $STANDALONE_CERT -eq 1 ]; then
+#  iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" --standalone -d ${HOST_NAME} -k 4096 --fullchain-file /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain.pem --key-file /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
+#elif [ $DNS_CERT -eq 1 ]; then
+#  iocage exec ${JAIL_NAME} /mnt/configs/acme_dns_issue.sh
+#fi
+
+
+echo "before copy ssl directory"
 # Copy and edit pre-written config files
+
 iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/nginx/ssl/
 echo "make directory /usr/local/etc/nginx/ssl/"
 iocage exec ${JAIL_NAME} -- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /usr/local/etc/nginx/ssl/nginx-selfsigned.key -out /usr/local/etc/nginx/ssl/nginx-selfsigned.crt -subj "/C=${C_NAME}/ST=$P{ST_NAME}/L=${L_NAME}/O=${O_NAME}/OU={OU_NAME}/CN={HOST_NAME}"
@@ -213,6 +234,17 @@ iocage restart ${JAIL_NAME}
 iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 echo "certbot done"
 
+#*****************delete this section after staging complete to copy ssl certificate from another jail
+#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
+#cp -r /mnt/iocage/jails/nextcloud2/root/usr/local/etc/letsencrypt/archive/${HOST_NAME}/ /mnt/iocage/jails/${JAIL_NAME}/root/usr/local/etc/letsencrypt/live/${HOST_NAME}/
+#iocage exec ${JAIL_NAME} sed -i '' "s/fullchain/fullchain1/" /usr/local/etc/nginx/nginx.conf
+#iocage exec ${JAIL_NAME} sed -i '' "s/chain/chain1/" /usr/local/etc/nginx/nginx.conf
+#iocage exec ${JAIL_NAME} sed -i '' "s/privkey/privkey1/" /usr/local/etc/nginx/nginx.conf
+#iocage exec ${JAIL_NAME} sed -i '' "s/fullchain/fullchain1/" /usr/local/etc/nginx/nginx.conf
+#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain.pem
+#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/chain1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/chain.pem
+#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
+
 # Secure database, set root password, create Nextcloud DB, user, and password
 iocage exec ${JAIL_NAME} mysql -u root -e "CREATE DATABASE nextcloud;"
 iocage exec ${JAIL_NAME} mysql -u root -e "GRANT ALL ON nextcloud.* TO nextcloud@localhost IDENTIFIED BY '${DB_PASSWORD}';"
@@ -231,15 +263,23 @@ iocage exec ${JAIL_NAME} echo "Nextcloud database password is ${DB_PASSWORD}" >>
 iocage exec ${JAIL_NAME} echo "Nextcloud Administrator password is ${ADMIN_PASSWORD}" >> /root/db_password.txt
 #iocage exec ${JAIL_NAME} echo "Data folder = /mnt/files, Database host = localhost:/tmp/mysql.sock" >> /root/db_password.txt
 
+# If standalone mode was used to issue certificate, reissue using webroot
+#if [ $STANDALONE_CERT -eq 1 ]; then
+#  iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" -d ${HOST_NAME} -w /usr/local/www/apache24/data -k 4096 --fullchain-file /usr/local/etc/pki/tls/certs/fullchain.pem --key-file /usr/local/etc/pki/tls/private/privkey.pem --reloadcmd "service apache24 reload"
+#iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" -d ${HOST_NAME} -w /usr/local/www -k 4096 --fullchain-file /usr/local/etc/fullchain.pem --key-file /usr/local/etc/pki/tls/private/privkey.pem --reloadcmd "service nginx reload"
+
+#fi
+
+
 # Don't need /mnt/configs any more, so unmount it
 iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 iocage exec ${JAIL_NAME} service nginx restart
 
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"nextcloud\" --database-pass=\"${DB_PASSWORD}\" --database-host=\"localhost:/tmp/mysql.sock\" --admin-user=\"admin\" --admin-pass=\"${ADMIN_PASSWORD}\" --data-dir=\"/mnt/files\""
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.local --value="\OC\Memcache\APCu"'
-#iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis host --value="/tmp/redis.sock"'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis port --value=0 --type=integer'
+iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${HOST_NAME}\""
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${JAIL_IP}\""
 
@@ -266,13 +306,12 @@ iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:s
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enabledPreviewProviders 19 --value="OC\Preview\TIFF"'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enabledPreviewProviders 20 --value="OC\Preview\Font"'
   
-iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} ln -s /usr/local/www/nextcloud/robots.txt /usr/local/www
 
-# add media group to www user to be able to use external storage with ${POOL_PATH}/media
-#iocage exec ${JAIL_NAME} pw groupadd -n media -g 8675309
-#iocage exec ${JAIL_NAME} pw groupmod media -m www
-#iocage restart ${JAIL_NAME} 
+# add media group to www user
+iocage exec ${JAIL_NAME} pw groupadd -n media -g 8675309
+iocage exec ${JAIL_NAME} pw groupmod media -m www
+iocage restart ${JAIL_NAME} 
 
 # Done!
 echo "Installation complete!"
@@ -286,4 +325,5 @@ echo "Database password = ${DB_PASSWORD}"
 echo "The MariaDB root password is ${DB_ROOT_PASSWORD}"
 echo ""
 echo "All passwords are saved in /root/db_password.txt"
+#echo "to start run https://${JAIL_IP}/nextcloud and enter info, Data folder = /mnt/files, Database host = localhost:/tmp/mysql.sock"
 echo "to start run https://${JAIL_IP}/nextcloud"
