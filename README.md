@@ -60,4 +60,4 @@ I'd also appreciate any suggestions (or pull requests) to improve the various co
 
 ### Backup and Restore
 NextcloudBackup.sh and NextcloudRestore.sh are automatically copied to the jails /usr directory.  View their contents for instructions and settings.
-At this time you can only restore backups automatically if the dbuser and dbpassword are the same ie backups restored to the same setup.
+At the end of the restore the script will resset the admin password and  ask for a new one.  If you previously had 2 factor authentication turned on uncomment that line to remove it.  After complete you can re enable it with the GUI. 
