@@ -156,6 +156,7 @@ mkdir -p ${FILES_PATH}
 chown -R 80:80 ${FILES_PATH}
 mkdir -p ${PORTS_PATH}/ports
 mkdir -p ${PORTS_PATH}/db
+mkdir -p ${POOL_PATH}/media
 mkdir -p ${POOL_PATH}/NextcloudBackups
 iocage exec ${JAIL_NAME} mkdir -p /mnt/files
 iocage exec ${JAIL_NAME} mkdir -p /var/db/mysql
@@ -167,7 +168,6 @@ iocage fstab -a ${JAIL_NAME} ${DB_PATH} /var/db/mysql  nullfs  rw  0  0
 iocage fstab -a ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/media /mnt/media nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/NextcloudBackups /mnt/NextcloudBackups nullfs rw 0 0
-echo ${POOL_PATH}/media 
 iocage exec ${JAIL_NAME} chown -R www:www /mnt/files
 iocage exec ${JAIL_NAME} chmod -R 770 /mnt/files
 iocage exec ${JAIL_NAME} "if [ -z /usr/ports ]; then portsnap fetch extract; else portsnap auto; fi"
