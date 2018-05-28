@@ -60,3 +60,4 @@ I'd also appreciate any suggestions (or pull requests) to improve the various co
 
 ### Backup and Restore
 NextcloudBackup.sh and NextcloudRestore.sh are automatically copied to the jails /usr directory.  View their contents for instructions and settings.
+At this time you can only restore backups automatically if the dbuser and dbpassword are the same ie backups restored to the same setup.
