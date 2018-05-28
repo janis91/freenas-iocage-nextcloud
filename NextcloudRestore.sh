@@ -120,6 +120,14 @@ echo "Done"
 echo
 
 #
+# Copy config.php to /mnt/NextcloudBackups
+#
+cp $nextcloudFileDir/config/config.php $mainBackupDir/
+echo "copy config.php"
+echo "done"
+echo
+
+#
 # Delete old Nextcloud direcories
 #
 echo "Deleting old Nextcloud file directory..."
@@ -194,6 +202,16 @@ echo
 #echo "changed the Database user and password"
 
 #
+# Copy config.php back to original location
+#
+cp $mainBackupDir/config.php $nextcloudFileDir/config/
+rm $mainBackupDir/config.php
+echo "replace with original config.php"
+echo "done"
+echo
+
+
+#
 # Update the system data-fingerprint (see https://docs.nextcloud.com/server/13/admin_manual/configuration_server/occ_command.html#maintenance-commands-label)
 #
 echo "Updating the system data-fingerprint..."
@@ -212,9 +230,19 @@ su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:mode --off'
 #sudo -u "${webserverUser}" php occ maintenance:mode --off
 echo "Done"
 echo
-echo "If you receive errors with the last 2 commands you have to edit the config.php dbuser and dbpassword and run the last 2 commands manually"
-echo "su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:data-fingerprint'"
-echo "su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:mode --off'"
+
+#
+# Reset nextcloud admin password
+#
+echo "reset admin password"
+su -m www -c 'php /usr/local/www/nextcloud/occ user:resetpassword admin'
+echo
+
+#su -m www -c 'php /usr/local/www/nextcloud/occ twofactor:disable admin'
+
+#echo "If you receive errors with the last 2 commands you have to edit the config.php dbuser and dbpassword and run the last 2 commands manually"
+#echo "su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:data-fingerprint'"
+#echo "su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:mode --off'"
 echo
 echo "DONE!"
 echo "Backup ${restore} successfully restored."
