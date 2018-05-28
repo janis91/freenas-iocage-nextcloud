@@ -314,6 +314,11 @@ iocage exec ${JAIL_NAME} pw groupadd -n media -g 8675309
 iocage exec ${JAIL_NAME} pw groupmod media -m www
 iocage restart ${JAIL_NAME} 
 
+# copy backup and restore scripts
+cp -f /git/freenas-iocage-nextcloud/NextcloudBackup.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBackup.sh
+cp -f /git/freenas-iocage-nextcloud/NextcloudRestore.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudRestore.sh
+echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
+
 # Done!
 echo "Installation complete!"
 echo "Using your web browser, go to https://${HOST_NAME} to log in"
@@ -325,6 +330,6 @@ echo "Database user = nextcloud"
 echo "Database password = ${DB_PASSWORD}"
 echo "The MariaDB root password is ${DB_ROOT_PASSWORD}"
 echo ""
-echo "All passwords are saved in /root/db_password.txt"
+echo "All passwords are saved in /root/${JAIL_NAME}_db_password.txt"
 #echo "to start run https://${JAIL_IP}/nextcloud and enter info, Data folder = /mnt/files, Database host = localhost:/tmp/mysql.sock"
 echo "to start run https://${JAIL_IP}/nextcloud"
