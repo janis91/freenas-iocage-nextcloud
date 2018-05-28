@@ -57,3 +57,6 @@ Once you've downloaded the script, prepared the configuration file, run this scr
 This script has been tested on my system, in Standalone mode only, and everything seems to be working properly.  Further testing is, of course, always appreciated.
 
 I'd also appreciate any suggestions (or pull requests) to improve the various config files I'm using.  Most of them are adapted from the default configuration files that ship with the software in question, and have only been lightly edited to work in this application.  But if there are changes to settings or organization that could improve performance or reliability, I'd like to hear about them.
+
+### Backup and Restore
+NextcloudBackup.sh and NextcloudRestore.sh are automatically copied to the jails /usr directory.  View their contents for instructions and settings.
