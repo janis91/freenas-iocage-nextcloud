@@ -146,12 +146,14 @@ echo
 # Restore file and data directory
 #
 echo "Restoring Nextcloud file directory..."
-tar -xpzf "${currentRestoreDir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}"
+#tar -xpzf "${currentRestoreDir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}"
+rsync -Aax "${currentRestoreDir}/nextcloud/" ${nextcloudFileDir}
 echo "Done"
 echo
 
 echo "Restoring Nextcloud data directory..."
-tar -xpzf "${currentRestoreDir}/${fileNameBackupDataDir}" -C "${nextcloudDataDir}"
+#tar -xpzf "${currentRestoreDir}/${fileNameBackupDataDir}" -C "${nextcloudDataDir}"
+rsync -Aax ${currentRestoreDir}/files/ ${nextcloudDataDir}
 echo "Done"
 echo
 
@@ -204,7 +206,7 @@ echo
 #
 # Copy config.php back to original location
 #
-cp $mainBackupDir/config.php $nextcloudFileDir/config/
+cp $mainBackupDir/config.php "${nextcloudFileDir}/config/"
 rm $mainBackupDir/config.php
 echo "replace with original config.php"
 echo "done"

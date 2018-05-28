@@ -1,5 +1,5 @@
 #!/usr/local/bin/bash
-
+echo "test"
 #
 # Bash script for making backups of Nextcloud.
 # Usage: ./NextcloudBackup.sh <dbPassword> (e.g. ./NextcloudRestore.sh <dbPassword>)
@@ -40,7 +40,7 @@ dbPassword=$1
 # TODO: Your web server user
 webserverUser="www"
 # TODO: The maximum number of backups to keep (when set to 0, all backups are kept)
-maxNrOfBackups=3
+maxNrOfBackups=4
 
 # File names for backup files
 # If you prefer other file names, you'll also have to change the NextcloudRestore.sh script.
@@ -72,7 +72,7 @@ if [ -z "$1" ]
      exit 1
 fi
 
-
+echo $1
 
 #
 # Check for root
@@ -116,12 +116,14 @@ echo
 # Backup file and data directory
 #
 echo "Creating backup of Nextcloud file directory..."
-tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
+#tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
+rsync -avx ${nextcloudFileDir} ${backupdir}
 echo "Done"
 echo
 
 echo "Creating backup of Nextcloud data directory..."
-tar -cpzf "${backupdir}/${fileNameBackupDataDir}"  -C "${nextcloudDataDir}" .
+#tar -cpzf "${backupdir}/${fileNameBackupDataDir}"  -C "${nextcloudDataDir}" .
+rsync -avx ${nextcloudDataDir} ${backupdir} 
 echo "Done"
 echo
 
