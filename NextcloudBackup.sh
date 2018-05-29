@@ -34,7 +34,7 @@ webserverServiceName="nginx"
 # TODO: Your Nextcloud database name
 nextcloudDatabase="nextcloud"
 # TODO: Your Nextcloud database user
-dbUser="nextcloud"
+dbUser="warren"
 # TODO: The password of the Nextcloud database user
 dbPassword=$1
 # TODO: Your web server user
@@ -117,6 +117,7 @@ echo
 #
 echo "Creating backup of Nextcloud file directory..."
 #tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
+#rsync -avx "${nextcloudFileDir} "${backupdir}/${fileNameBackupFileDir}"
 rsync -avx ${nextcloudFileDir} ${backupdir}
 echo "Done"
 echo
