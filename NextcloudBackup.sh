@@ -1,5 +1,5 @@
 #!/usr/local/bin/bash
-echo "test"
+
 #
 # Bash script for making backups of Nextcloud.
 # Usage: ./NextcloudBackup.sh <dbPassword> (e.g. ./NextcloudRestore.sh <dbPassword>)
@@ -34,7 +34,7 @@ webserverServiceName="nginx"
 # TODO: Your Nextcloud database name
 nextcloudDatabase="nextcloud"
 # TODO: Your Nextcloud database user
-dbUser="warren"
+dbUser="nextcloud"
 # TODO: The password of the Nextcloud database user
 dbPassword=$1
 # TODO: Your web server user
@@ -72,7 +72,7 @@ if [ -z "$1" ]
      exit 1
 fi
 
-echo $1
+
 
 #
 # Check for root
@@ -117,14 +117,17 @@ echo
 #
 echo "Creating backup of Nextcloud file directory..."
 #tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
-#rsync -avx "${nextcloudFileDir} "${backupdir}/${fileNameBackupFileDir}"
-rsync -avx ${nextcloudFileDir} ${backupdir}
+mkdir -p "${backupdir}nextcloud/"
+rsync -avx "${nextcloudFileDir}/" "${backupdir}nextcloud/"
+#rsync -avx "${nextcloudFileDir}/ "${backupdir}/${fileNameBackupFileDir}"
 echo "Done"
 echo
 
 echo "Creating backup of Nextcloud data directory..."
 #tar -cpzf "${backupdir}/${fileNameBackupDataDir}"  -C "${nextcloudDataDir}" .
-rsync -avx ${nextcloudDataDir} ${backupdir} 
+mkdir -p "${backupdir}/files/"
+rsync -avx "${nextcloudDataDir}/" "${backupdir}files/"
+#rsync -avx "${nextcloudDataDir}/ "${backupdir}/${fileNameBackupDataDir}" 
 echo "Done"
 echo
 
