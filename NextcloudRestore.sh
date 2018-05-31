@@ -147,12 +147,14 @@ echo
 #
 echo "Restoring Nextcloud file directory..."
 #tar -xpzf "${currentRestoreDir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}"
+echo "rsync -Aax "${currentRestoreDir}/nextcloud/" ${nextcloudFileDir}"
 rsync -Aax "${currentRestoreDir}/nextcloud/" ${nextcloudFileDir}
 echo "Done"
 echo
 
 echo "Restoring Nextcloud data directory..."
 #tar -xpzf "${currentRestoreDir}/${fileNameBackupDataDir}" -C "${nextcloudDataDir}"
+echo "rsync -Aax "${currentRestoreDir}/files/" ${nextcloudDataDir}"
 rsync -Aax ${currentRestoreDir}/files/ ${nextcloudDataDir}
 echo "Done"
 echo
@@ -223,6 +225,10 @@ su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:data-fingerprint'
 echo "Done"
 echo
 
+su -m www -c 'php /usr/local/www/nextcloud/occ twofactor:disable admin'
+su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:repair'
+
+
 #
 # Disbale maintenance mode
 #
@@ -241,6 +247,7 @@ su -m www -c 'php /usr/local/www/nextcloud/occ user:resetpassword admin'
 echo
 
 #su -m www -c 'php /usr/local/www/nextcloud/occ twofactor:disable admin'
+#su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:repair'
 
 #echo "If you receive errors with the last 2 commands you have to edit the config.php dbuser and dbpassword and run the last 2 commands manually"
 #echo "su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:data-fingerprint'"
@@ -248,3 +255,4 @@ echo
 echo
 echo "DONE!"
 echo "Backup ${restore} successfully restored."
+
