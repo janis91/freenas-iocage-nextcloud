@@ -116,18 +116,16 @@ echo
 # Backup file and data directory
 #
 echo "Creating backup of Nextcloud file directory..."
-#tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
-mkdir -p "${backupdir}nextcloud/"
-rsync -avx "${nextcloudFileDir}/" "${backupdir}nextcloud/"
-#rsync -avx "${nextcloudFileDir}/ "${backupdir}/${fileNameBackupFileDir}"
+tar -cpzf "${backupdir}/${fileNameBackupFileDir}" -C "${nextcloudFileDir}" .
+#mkdir -p "${backupdir}nextcloud/"
+#rsync -avx "${nextcloudFileDir}/" "${backupdir}nextcloud/"
 echo "Done"
 echo
 
 echo "Creating backup of Nextcloud data directory..."
-#tar -cpzf "${backupdir}/${fileNameBackupDataDir}"  -C "${nextcloudDataDir}" .
-mkdir -p "${backupdir}/files/"
-rsync -avx "${nextcloudDataDir}/" "${backupdir}files/"
-#rsync -avx "${nextcloudDataDir}/ "${backupdir}/${fileNameBackupDataDir}" 
+tar -cpzf "${backupdir}/${fileNameBackupDataDir}"  -C "${nextcloudDataDir}" .
+#mkdir -p "${backupdir}/files/"
+#rsync -avx "${nextcloudDataDir}/" "${backupdir}files/"
 echo "Done"
 echo
 
