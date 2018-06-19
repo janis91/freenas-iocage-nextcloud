@@ -271,9 +271,6 @@ iocage exec ${JAIL_NAME} echo "Nextcloud Administrator password is ${ADMIN_PASSW
 
 #fi
 
-
-# Don't need /mnt/configs any more, so unmount it
-iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 iocage exec ${JAIL_NAME} service nginx restart
 
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"nextcloud\" --database-pass=\"${DB_PASSWORD}\" --database-host=\"localhost:/tmp/mysql.sock\" --admin-user=\"admin\" --admin-pass=\"${ADMIN_PASSWORD}\" --data-dir=\"/mnt/files\""
@@ -283,6 +280,11 @@ iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:s
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${HOST_NAME}\""
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${JAIL_IP}\""
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ app:enable encryption"
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:enable"
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:disable"
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
+iocage exec ${JAIL_NAME} crontab -u www /mnt/configs/www-crontab
 
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enable_previews --value=true --type=boolean'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enabledPreviewProviders 0 --value="OC\Preview\PNG"'
@@ -317,7 +319,11 @@ iocage restart ${JAIL_NAME}
 # copy backup and restore scripts
 cp -f /git/freenas-iocage-nextcloud/NextcloudBackup.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBackup.sh
 cp -f /git/freenas-iocage-nextcloud/NextcloudRestore.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudRestore.sh
+cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
+
+# Don't need /mnt/configs any more, so unmount it
+iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 
 # Done!
 echo "Installation complete!"
