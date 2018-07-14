@@ -322,6 +322,10 @@ cp -f /git/freenas-iocage-nextcloud/NextcloudRestore.sh /mnt/iocage/jails/${JAIL
 cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
 
+#
+# Add Video previews
+iocage exec ${JAIL_NAME} pkg install -y ffmpeg
+
 # Don't need /mnt/configs any more, so unmount it
 iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 
