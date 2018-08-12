@@ -2,7 +2,7 @@
 
 #
 # Bash script for making backups of Nextcloud.
-# Usage: ./NextcloudBackup.sh <dbPassword> (e.g. ./NextcloudRestore.sh <dbPassword>)
+# Usage: /usr/NextcloudBackup.sh <dbPassword>
 #
 # The script is based on an installation of Nextcloud using nginx and MariaDB, see https://github.com/NasKar2/freenas-iocage-nextcloud
 # This script should be run in the nextcloud jail and assumes you have mounted /mnt/v1/NextcloudBackups to /mnt/NextcloudBackups to store backups
@@ -16,6 +16,17 @@
 # You have to customize this script (directories, users, etc.) for your actual environment.
 # All entries which need to be customized are tagged with "TODO".
 #
+
+# Must be run in the jail
+echo "This script must be run in the iocage jail of nextcloud"
+read iocage_jail
+if [ "${iocage_jail}" == "Y" ]; then
+  echo "you can continue"
+else
+ echo "must run cmd 'iocage console nextcloud'"
+ echo "the run /usr/NextcloudBackup.sh <dbPassword>"
+ exit 1
+fi
 
 
 # Variables
