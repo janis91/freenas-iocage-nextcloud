@@ -316,9 +316,10 @@ iocage exec ${JAIL_NAME} pw groupadd -n media -g 8675309
 iocage exec ${JAIL_NAME} pw groupmod media -m www
 iocage restart ${JAIL_NAME} 
 
-# copy backup and restore scripts
-cp -f /git/freenas-iocage-nextcloud/NextcloudBackup.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBackup.sh
-cp -f /git/freenas-iocage-nextcloud/NextcloudRestore.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudRestore.sh
+# copy backup and restore script and email settings script
+cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
+cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
+chmod 640 /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
 cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
 
