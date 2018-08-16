@@ -1,4 +1,5 @@
 # Variables
+cron=""
 backupMainDir="/mnt/NextcloudBackups" #The directory where you store the Nextcloud backups
 backupdir="${backupMainDir}/${currentDate}/" # The actual directory of the current backup - this is is subdirectory of the main directory above with a timestamp
 nextcloudFileDir="/usr/local/www/nextcloud" # The directory of your Nextcloud installation (this is a directory under your web root)
