@@ -270,6 +270,7 @@ iocage restart ${JAIL_NAME}
 cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
 cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
 chmod 640 /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
+iocage exec ${JAIL_NAME} sed -i '' "s/mydbpassword/${DB_PASSWORD}/" /usr/NextcloudBR-config
 cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
 
