@@ -29,6 +29,7 @@ L_NAME=""
 O_NAME=""
 OU_NAME=""
 EMAIL_NAME=""
+NO_SSL=""
 
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
@@ -187,19 +188,6 @@ iocage exec ${JAIL_NAME} 'echo 'DEFAULT_VERSIONS+=ssl=openssl' >> /etc/make.conf
 #iocage exec ${JAIL_NAME} portsnap fetch extract
 iocage exec ${JAIL_NAME} make -C /usr/ports/databases/pecl-redis clean install BATCH=yes
 iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=yes
-
-#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/certs/
-#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
-#iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
-#iocage exec ${JAIL_NAME} chmod 600 /usr/local/etc/pki/tls/private/privkey.pem
-
-#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
-#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/pki/tls/private/
-#iocage exec ${JAIL_NAME} touch /usr/local/etc/pki/tls/private/privkey.pem
-#iocage exec ${JAIL_NAME} chmod 600 /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
-#iocage exec ${JAIL_NAME} curl https://get.acme.sh -o /tmp/get-acme.sh
-#iocage exec ${JAIL_NAME} sh /tmp/get-acme.sh
-#iocage exec ${JAIL_NAME} rm /tmp/get-acme.sh
   
 # Issue certificate.  If standalone mode is selected, issue directly, otherwise call external script to issue cert via DNS validation
 #if [ $STANDALONE_CERT -eq 1 ]; then
@@ -212,13 +200,19 @@ iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=
 echo "before copy ssl directory"
 # Copy and edit pre-written config files
 
-iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/nginx/ssl/
-echo "make directory /usr/local/etc/nginx/ssl/"
-iocage exec ${JAIL_NAME} -- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /usr/local/etc/nginx/ssl/nginx-selfsigned.key -out /usr/local/etc/nginx/ssl/nginx-selfsigned.crt -subj "/C=${C_NAME}/ST=$P{ST_NAME}/L=${L_NAME}/O=${O_NAME}/OU={OU_NAME}/CN={HOST_NAME}"
-echo "openssl key generated"
-iocage exec ${JAIL_NAME} -- openssl dhparam -out /usr/local/etc/nginx/ssl/dhparam.pem 2048
-echo "dhparam done"
-iocage exec ${JAIL_NAME} cp -f /mnt/configs/nginx.conf /usr/local/etc/nginx/nginx.conf
+if [ NO_SSL = "yes" ]; then
+   iocage exec ${JAIL_NAME} cp -f /mnt/configs/nginx.basic.conf /usr/local/etc/nginx/nginx.conf
+   echo "NO_SSL=${NO_SSL}"
+else
+   iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/nginx/ssl/
+   echo "make directory /usr/local/etc/nginx/ssl/"
+   iocage exec ${JAIL_NAME} -- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /usr/local/etc/nginx/ssl/nginx-selfsigned.key -out /usr/local/etc/nginx/ssl/nginx-selfsigned.crt -subj "/C=${C_NAME}/ST=$P{ST_NAME}/L=${L_NAME}/O=${O_NAME}/OU={OU_NAME}/CN={HOST_NAME}"
+   echo "openssl key generated"
+   iocage exec ${JAIL_NAME} -- openssl dhparam -out /usr/local/etc/nginx/ssl/dhparam.pem 2048
+   echo "dhparam done"
+   iocage exec ${JAIL_NAME} cp -f /mnt/configs/nginx.conf /usr/local/etc/nginx/nginx.conf
+fi
+
 iocage exec ${JAIL_NAME} cp -f /mnt/configs/php.ini /usr/local/etc/php.ini
 iocage exec ${JAIL_NAME} cp -f /mnt/configs/redis.conf /usr/local/etc/redis.conf      
 iocage exec ${JAIL_NAME} cp -f /mnt/configs/www.conf /usr/local/etc/php-fpm.d/
@@ -230,10 +224,14 @@ iocage exec ${JAIL_NAME} sed -i '' "s/youripaddress/${JAIL_IP}/" /usr/local/etc/
 #iocage exec ${JAIL_NAME} openssl dhparam -out /usr/local/etc/pki/tls/private/dhparams_4096.pem 4096
 iocage restart ${JAIL_NAME}
 
+if [ NO_SSL = "yes" ]; then
+   echo "NO_SSL="YES"
+else
 #iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 #iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 echo "certbot done"
+fi
 
 #*****************delete this section after staging complete to copy ssl certificate from another jail
 #iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
