@@ -37,6 +37,7 @@ L_NAME="yourcity"
 O_NAME="FreeNAS"
 OU_NAME="FreeNAS_IT"
 EMAIL_NAME="youremail@gmail.com"
+NO_SSL=""
 
 ```
 Many of the options are self-explanatory, and all should be adjusted to suit your needs.  JAIL_IP and DEFAULT_GW_IP are the IP address and default gateway, respectively, for your jail.  INTERFACE is the network interface that your FreeNAS server is actually using.  If you have multiple interfaces, run `ifconfig` and see which one has an IP address, and enter that one here. If you want to use a virtual non-shared IP, pick a unused name as your interface and set VNET to ''on''  POOL_PATH is the path for your data pool, on which the Nextcloud user data and MariaDB database will be stored.  JAIL_NAME is the name of the jail, and wouldn't ordinarily need to be changed.  If you don't specify it in nextcloud-config, JAIL_NAME will default to "nextcloud".  TIME_ZONE is the time zone of your location, as PHP sees it--see the [PHP manual](http://php.net/manual/en/timezones.php) for a list of all valid time zones.
@@ -49,6 +50,7 @@ Finally, TEST_CERT is a flag to issue test certificates from Let's Encrypt.  The
 
 It's also helpful if HOST_NAME resolves to your jail from **inside** your network.  You'll probably need to configure this on your router.  If it doesn't, you'll still be able to reach your Nextcloud installation via the jail's IP address, but you'll get certificate errors that way.
 To automate the generation of an openssl certificate add the options for C_NAME your country of origin, ST_NAME your state, L_NAME your city, O_name is your orgainization, OU_NAME is your department, and finally EMAIL_NAME is your email address.
+Set NO_SSL="yes" if you don't want to install with ssl
 
 ### Execution
 Once you've downloaded the script, prepared the configuration file, run this script (`./nextcloud-jail.sh`).  The script will run for several minutes.  When it finishes, your jail will be created, Nextcloud will be installed and configured, and you'll be shown the randomly-generated password for the default user ("admin").  You can then log in and create users, add data, and generally do whatever else you like. Redis command is entered last. I don't know why but it gives errors if placed after APCU command.
