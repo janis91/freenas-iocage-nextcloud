@@ -144,8 +144,10 @@ if [ -z $EMAIL_NAME ]; then
 echo 'Configuration error: OU_NAME must be set'
 exit 1
 fi
-
-#echo '{"pkgs":["nano","openssl","py27-certbot","nginx","mariadb100-server","redis","php70-bz2","php70-ctype","php70-curl","php70-dom","php70-exif","php70-fileinfo","php70-filter","php70-gd","php70-hash","php70-iconv","php70-intl","php70-json","php70-mbstring","php70-mcrypt","php70-pdo_mysql","php70-openssl","php70-posix","php70-session","php70-simplexml","php70-xml","php70-xmlreader","php70-xmlwriter","php70-xsl","php70-wddx","php70-zip","php70-zlib","php70-opcache"]}' > /tmp/pkg.json
+echo $NO_SSL
+if [ -z $NO_SSL ]; then
+NO_SSL="no"
+fi 
 
 echo '{"pkgs":["nano","rsync","openssl","curl","sudo","php72-phar","py27-certbot","nginx","mariadb102-server","redis","php72-ctype","php72-dom","php72-gd","php72-iconv","php72-json","php72-mbstring","php72-posix","php72-simplexml","","php72-xmlreader","php72-xmlwriter","php72-zip","php72-zlib","php72-pdo_mysql","php72-hash","php72-xml","php72-session","php72-mysqli","php72-wddx","php72-xsl","php72-filter","php72-curl","php72-fileinfo","php72-bz2","php72-intl","php72-openssl","php72-ldap","php72-ftp","php72-imap","php72-exif","php72-gmp","php72-memcache","php72-opcache","php72-pcntl","php72","mod_php72","bash","p5-Locale-gettext","help2man","texinfo","m4","autoconf","socat","git","perl5.28"]}' > /tmp/pkg.json
 iocage create --name "${JAIL_NAME}" -p /tmp/pkg.json -r $RELEASE ip4_addr="${INTERFACE}|${JAIL_IP}/24" defaultrouter="${DEFAULT_GW_IP}" boot="on" host_hostname="${JAIL_NAME}" vnet="${VNET}"
@@ -189,18 +191,9 @@ iocage exec ${JAIL_NAME} 'echo 'DEFAULT_VERSIONS+=ssl=openssl' >> /etc/make.conf
 iocage exec ${JAIL_NAME} make -C /usr/ports/databases/pecl-redis clean install BATCH=yes
 iocage exec ${JAIL_NAME} make -C /usr/ports/devel/pecl-APCu clean install BATCH=yes
   
-# Issue certificate.  If standalone mode is selected, issue directly, otherwise call external script to issue cert via DNS validation
-#if [ $STANDALONE_CERT -eq 1 ]; then
-#  iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" --standalone -d ${HOST_NAME} -k 4096 --fullchain-file /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain.pem --key-file /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
-#elif [ $DNS_CERT -eq 1 ]; then
-#  iocage exec ${JAIL_NAME} /mnt/configs/acme_dns_issue.sh
-#fi
-
-
-echo "before copy ssl directory"
 # Copy and edit pre-written config files
 
-if [ NO_SSL = "yes" ]; then
+if [ $NO_SSL = "yes" ]; then
    iocage exec ${JAIL_NAME} cp -f /mnt/configs/nginx.basic.conf /usr/local/etc/nginx/nginx.conf
    echo "NO_SSL=${NO_SSL}"
 else
@@ -224,25 +217,14 @@ iocage exec ${JAIL_NAME} sed -i '' "s/youripaddress/${JAIL_IP}/" /usr/local/etc/
 #iocage exec ${JAIL_NAME} openssl dhparam -out /usr/local/etc/pki/tls/private/dhparams_4096.pem 4096
 iocage restart ${JAIL_NAME}
 
-if [ NO_SSL = "yes" ]; then
-   echo "NO_SSL="YES"
+if [ $NO_SSL = "yes" ]; then
+   echo "NO_SSL check yes"
 else
-#iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
-#iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
-iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
-echo "certbot done"
+   #iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+   #iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+   iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+   echo "certbot done"
 fi
-
-#*****************delete this section after staging complete to copy ssl certificate from another jail
-#iocage exec ${JAIL_NAME} mkdir -p /usr/local/etc/letsencrypt/live/${HOST_NAME}/
-#cp -r /mnt/iocage/jails/nextcloud2/root/usr/local/etc/letsencrypt/archive/${HOST_NAME}/ /mnt/iocage/jails/${JAIL_NAME}/root/usr/local/etc/letsencrypt/live/${HOST_NAME}/
-#iocage exec ${JAIL_NAME} sed -i '' "s/fullchain/fullchain1/" /usr/local/etc/nginx/nginx.conf
-#iocage exec ${JAIL_NAME} sed -i '' "s/chain/chain1/" /usr/local/etc/nginx/nginx.conf
-#iocage exec ${JAIL_NAME} sed -i '' "s/privkey/privkey1/" /usr/local/etc/nginx/nginx.conf
-#iocage exec ${JAIL_NAME} sed -i '' "s/fullchain/fullchain1/" /usr/local/etc/nginx/nginx.conf
-#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/fullchain.pem
-#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/chain1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/chain.pem
-#iocage exec ${JAIL_NAME} mv /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey1.pem /usr/local/etc/letsencrypt/live/${HOST_NAME}/privkey.pem
 
 # Secure database, set root password, create Nextcloud DB, user, and password
 iocage exec ${JAIL_NAME} mysql -u root -e "CREATE DATABASE nextcloud;"
@@ -284,6 +266,7 @@ iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encrypti
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:disable"
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 iocage exec ${JAIL_NAME} crontab -u www /mnt/configs/www-crontab
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/cron.php"
 
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enable_previews --value=true --type=boolean'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enabledPreviewProviders 0 --value="OC\Preview\PNG"'
@@ -315,24 +298,33 @@ iocage exec ${JAIL_NAME} pw groupadd -n media -g 8675309
 iocage exec ${JAIL_NAME} pw groupmod media -m www
 iocage restart ${JAIL_NAME} 
 
+#
+# Add Video previews
+iocage exec ${JAIL_NAME} pkg install -y ffmpeg
+
+
+echo
+echo
+echo
 # copy backup and restore script and email settings script
 cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
 cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
 chmod 600 /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
-iocage exec ${JAIL_NAME} sed -i '' "s/mydbpassword/${DB_PASSWORD}/" /usr/NextcloudBR-config
+iocage exec ${JAIL_NAME} sed -i '' "s|mydbpassword|${DB_PASSWORD}|" /usr/NextcloudBR-config
 cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
-
-#
-# Add Video previews
-iocage exec ${JAIL_NAME} pkg install -y ffmpeg
 
 # Don't need /mnt/configs any more, so unmount it
 iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 
 # Done!
+echo "##########################################################################"
 echo "Installation complete!"
-echo "Using your web browser, go to https://${HOST_NAME} to log in"
+if [ $NO_SSL = "yes" ]; then
+   echo "Using your web browser, go to https://${JAIL_IP}/nextcloud to log in"
+else
+   echo "Using your web browser, go to https://${HOST_NAME}/nextcloud to log in"
+fi
 echo "Default user is admin, password is ${ADMIN_PASSWORD}"
 echo ""
 echo "Database Information"
@@ -342,5 +334,4 @@ echo "Database password = ${DB_PASSWORD}"
 echo "The MariaDB root password is ${DB_ROOT_PASSWORD}"
 echo ""
 echo "All passwords are saved in /root/${JAIL_NAME}_db_password.txt"
-#echo "to start run https://${JAIL_IP}/nextcloud and enter info, Data folder = /mnt/files, Database host = localhost:/tmp/mysql.sock"
-echo "to start run https://${JAIL_IP}/nextcloud"
+
