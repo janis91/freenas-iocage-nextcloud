@@ -15,7 +15,7 @@ cp -R iocage/iocage/lib/ /usr/local/lib/python3.6/site-packages/iocage/lib
 ## Usage
 
 ### Prerequisites
-Although not required, it's recommended to create two Datasets on your main storage pool: one named `files`, which will store the Nextcloud user data; and one called `db`, which will store the MariaDB database.  Set `files` Dataset commpression to lz4 and Enable atime to off. Set the `db` Dataset compression to zle and Enable atime to off.  For optimal performance, set the record size of the `db` Dataset to 16 KB (under Advanced Settings).
+Although not required, it's recommended to create two Datasets on your main storage pool: one named `files`, which will store the Nextcloud user data; and one called `db`, which will store the MariaDB database.  Set `files` Dataset compression to lz4 and Enable atime to off. Set the `db` Dataset compression to zle and Enable atime to off.  For optimal performance, set the record size of the `db` Dataset to 16 KB (under Advanced Settings).
 
 ### Installation
 Download the repository to a convenient directory on your FreeNAS system by running `git clone https://github.com/NasKar2/freenas-iocage-nextcloud.git`.  Then change into the new directory and create a file called `nextcloud-config`.  It should look like this:
