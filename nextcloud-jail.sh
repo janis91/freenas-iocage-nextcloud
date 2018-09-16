@@ -242,8 +242,7 @@ iocage exec ${JAIL_NAME} sed -i '' "s|mypassword|${DB_ROOT_PASSWORD}|" /root/.my
 iocage exec ${JAIL_NAME} echo "MySQL root password is ${DB_ROOT_PASSWORD}" > /root/${JAIL_NAME}_db_password.txt
 iocage exec ${JAIL_NAME} echo "Nextcloud database password is ${DB_PASSWORD}" >> /root/${JAIL_NAME}_db_password.txt
 iocage exec ${JAIL_NAME} echo "Nextcloud Administrator password is ${ADMIN_PASSWORD}" >> /root/${JAIL_NAME}_db_password.txt
-
-#iocage exec ${JAIL_NAME} echo "Data folder = /mnt/files, Database host = localhost:/tmp/mysql.sock" >> /root/db_password.txt
+iocage exec ${JAIL_NAME} chmod 600 /root/${JAIL_NAME}_db_password.txt
 
 # If standalone mode was used to issue certificate, reissue using webroot
 #if [ $STANDALONE_CERT -eq 1 ]; then
