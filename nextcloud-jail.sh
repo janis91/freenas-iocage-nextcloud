@@ -23,6 +23,7 @@ PORTS_PATH=""
 STANDALONE_CERT=0
 DNS_CERT=0
 TEST_CERT="--staging"
+TYPE_CERT="--webroot"
 C_NAME="US"
 ST_NAME=""
 L_NAME=""
@@ -221,8 +222,11 @@ if [ $NO_SSL = "yes" ]; then
    echo "NO_SSL check yes"
 else
    #iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
-   #iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
-   iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+	if [ TYPE_CERT = "--webroot" ]; then
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+	else
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+	fi
    echo "certbot done"
 fi
 

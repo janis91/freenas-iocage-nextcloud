@@ -31,6 +31,7 @@ HOST_NAME="YOUR_FQDN"
 STANDALONE_CERT=0
 DNS_CERT=0
 TEST_CERT="--staging"
+TYPE_CERT="--webroot"
 C_NAME="US"
 ST_NAME="yourstate"
 L_NAME="yourcity"
@@ -50,6 +51,7 @@ Finally, TEST_CERT is a flag to issue test certificates from Let's Encrypt.  The
 
 It's also helpful if HOST_NAME resolves to your jail from **inside** your network.  You'll probably need to configure this on your router.  If it doesn't, you'll still be able to reach your Nextcloud installation via the jail's IP address, but you'll get certificate errors that way.
 To automate the generation of an openssl certificate add the options for C_NAME your country of origin, ST_NAME your state, L_NAME your city, O_name is your orgainization, OU_NAME is your department, and finally EMAIL_NAME is your email address.
+Set TYPE_CERT="--webroot" for webroot anything else will be --standalone.
 Set NO_SSL="yes" if you don't want to install with ssl
 
 ### Execution
