@@ -84,12 +84,12 @@ if [ $DNS_CERT -eq 1 ] && ! [ -x $CONFIGS_PATH/acme_dns_issue.sh ]; then
 fi
 
 # If DB_PATH, FILES_PATH, and PORTS_PATH weren't set in nextcloud-config, set them
-if [ -z $DB_PATH ]; then
-  DB_PATH="${POOL_PATH}/db"
-fi
-if [ -z $FILES_PATH ]; then
-  FILES_PATH="${POOL_PATH}/files"
-fi
+#if [ -z $DB_PATH ]; then
+#  DB_PATH="${POOL_PATH}/db"
+#fi
+#if [ -z $FILES_PATH ]; then
+#  FILES_PATH="${POOL_PATH}/files"
+#fi
 if [ -z $PORTS_PATH ]; then
   PORTS_PATH="${POOL_PATH}/portsnap"
 fi
@@ -155,6 +155,11 @@ fi
 #iocage create --name "${JAIL_NAME}" -r $RELEASE ip4_addr="${INTERFACE}|${JAIL_IP}/24" defaultrouter="${DEFAULT_GW_IP}" boot="on" host_hostname="${JAIL_NAME}" allow_raw_sockets="1" vnet="${VNET}"
 #rm /tmp/pkg.json
 
+echo "you must manually create the jail and then in the jail run the pkg command"
+echo "iocage create --name" ${JAIL_NAME} -r ${RELEASE}" ip4_addr=${INTERFACE}|${JAIL_IP}/24 defaultrouter=${DEFAULT_GW_IP}  boot="on" host_hostname=${JAIL_NAME} allow_raw_sockets="1" vnet=${VNET}"
+echo "then edit the script to remove exit and re run it"
+
+exit
 # fix 'libdl.so.1 missing' error in 11.1 versions, by reinstalling packages from older FreeBSD release
 # source: https://forums.freenas.org/index.php?threads/openvpn-fails-in-jail-with-libdl-so-1-not-found-error.70391/
 if [ "${RELEASE}" = "11.1-RELEASE" ]; then
@@ -163,7 +168,7 @@ if [ "${RELEASE}" = "11.1-RELEASE" ]; then
   iocage exec ${JAIL_NAME} pkg upgrade -yf
 fi
 
-iocage exec ${JAIL_NAME} pkg install nano rsync openssl curl sudo php72-phar py27-certbot nginx mariadb102-server redis php72-ctype php72-dom php72-gd php72-iconv php72-json php72-mbstring php72-posix php72-simplexml php72-xmlreader php72-xmlwriter php72-zip php72-zlib php72-pdo_mysql php72-hash php72-xml php72-session php72-mysqli php72-wddx php72-xsl php72-filter php72-curl php72-fileinfo php72-bz2 php72-intl php72-openssl php72-ldap php72-ftp php72-imap php72-exif php72-gmp php72-memcache php72-opcache php72-pcntl php72 mod_php72 bash p5-Locale-gettext help2man texinfo m4 autoconf socat git perl5
+iocage exec ${JAIL_NAME} pkg install nano rsync openssl curl sudo php72-phar py27-certbot nginx mariadb102-server redis php72-ctype php72-dom php72-gd php72-iconv php72-json php72-mbstring php72-posix php72-simplexml php72-xmlreader php72-xmlwriter php72-zip php72-zlib php72-pdo_mysql php72-hash php72-xml php72-session php72-mysqli php72-wddx php72-xsl php72-filter php72-curl php72-fileinfo php72-bz2 php72-intl php72-openssl php72-ldap php72-ftp php72-imap php72-exif php72-gmp php72-memcache php72-opcache php72-pcntl php72 mod_php72 php72-pecl-APCu bash p5-Locale-gettext help2man texinfo m4 autoconf socat git perl5
 
 mkdir -p ${DB_PATH}/
 chown -R 88:88 ${DB_PATH}/
@@ -268,10 +273,10 @@ chmod 600 /root/${JAIL_NAME}_db_password.txt
 iocage exec ${JAIL_NAME} service nginx restart
 
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ maintenance:install --database=\"mysql\" --database-name=\"nextcloud\" --database-user=\"nextcloud\" --database-pass=\"${DB_PASSWORD}\" --database-host=\"localhost:/tmp/mysql.sock\" --admin-user=\"admin\" --admin-pass=\"${ADMIN_PASSWORD}\" --data-dir=\"/mnt/files\""
-#iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.local --value="\OC\Memcache\APCu"'
-#iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis host --value="/tmp/redis.sock"'
-#iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis port --value=0 --type=integer'
-#iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
+iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.local --value="\OC\Memcache\APCu"'
+iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis host --value="/tmp/redis.sock"'
+iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis port --value=0 --type=integer'
+iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${HOST_NAME}\""
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${JAIL_IP}\""
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ app:enable encryption"
