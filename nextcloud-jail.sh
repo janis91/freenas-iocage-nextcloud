@@ -269,6 +269,7 @@ iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encrypti
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:disable"
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ background:cron"
 iocage exec ${JAIL_NAME} crontab -u www /mnt/configs/www-crontab
+iocage exec ${JAIL_NAME} crontab -u root /mnt/configs/root-crontab
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/cron.php"
 
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set enable_previews --value=true --type=boolean'
