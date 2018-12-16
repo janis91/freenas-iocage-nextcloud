@@ -151,7 +151,7 @@ NO_SSL="no"
 fi 
 
 echo '{"pkgs":["nano","rsync","openssl","curl","sudo","php72-phar","py27-certbot","nginx","mariadb102-server","redis","php72-ctype","php72-dom","php72-gd","php72-iconv","php72-json","php72-mbstring","php72-posix","php72-simplexml","php72-xmlreader","php72-xmlwriter","php72-zip","php72-zlib","php72-pdo_mysql","php72-hash","php72-xml","php72-session","php72-mysqli","php72-wddx","php72-xsl","php72-filter","php72-curl","php72-fileinfo","php72-bz2","php72-intl","php72-openssl","php72-ldap","php72-ftp","php72-imap","php72-exif","php72-gmp","php72-memcache","php72-opcache","php72-pcntl","php72","mod_php72","php72-pecl-APCu","bash","p5-Locale-gettext","help2man","texinfo","m4","autoconf","socat","git","perl5"]}' > /tmp/pkg.json
-iocage create --name "${JAIL_NAME}" -p /tmp/pkg.json -r ${RELEASE} ip4_addr="${INTERFACE}|${JAIL_IP}/24" defaultrouter="${DEFAULT_GW_IP}" boot="on" host_hostname="${JAIL_NAME}" vnet="${VNET}"
+iocage create --name "${JAIL_NAME}" -p /tmp/pkg.json -r ${RELEASE} ip4_addr="${INTERFACE}|${JAIL_IP}/24" defaultrouter="${DEFAULT_GW_IP}" boot="on" host_hostname="${JAIL_NAME}" vnet="${VNET}" allow_raw_sockets=1
 
 rm /tmp/pkg.json
 
@@ -177,9 +177,11 @@ iocage exec ${JAIL_NAME} chown -R www:www /mnt/files
 iocage exec ${JAIL_NAME} chmod -R 770 /mnt/files
 #iocage exec ${JAIL_NAME} "if [ -z /usr/ports ]; then portsnap fetch extract; else portsnap auto; fi"
 iocage exec ${JAIL_NAME} chsh -s /usr/local/bin/bash root
-iocage exec ${JAIL_NAME} fetch -o /tmp https://download.nextcloud.com/server/releases/latest.tar.bz2
-iocage exec ${JAIL_NAME} tar xjf /tmp/latest.tar.bz2 -C /usr/local/www/
-iocage exec ${JAIL_NAME} rm /tmp/latest.tar.bz2
+#iocage exec ${JAIL_NAME} fetch -o /tmp https://download.nextcloud.com/server/releases/latest.tar.bz2
+iocage exec ${JAIL_NAME} fetch -o /tmp https://download.nextcloud.com/server/releases/nextcloud-14.0.4.tar.bz2
+iocage exec ${JAIL_NAME} tar xjf /tmp/nextcloud-14.0.4.tar.bz2 -C /usr/local/www/
+#iocage exec ${JAIL_NAME} tar xjf /tmp/latest.tar.bz2 -C /usr/local/www/
+#iocage exec ${JAIL_NAME} rm /tmp/latest.tar.bz2
 iocage exec ${JAIL_NAME} chown -R www:www /usr/local/www/nextcloud/
 iocage exec ${JAIL_NAME} sysrc nginx_enable="YES"
 iocage exec ${JAIL_NAME} sysrc mysql_enable="YES"
@@ -311,11 +313,11 @@ echo
 echo
 echo
 # copy backup and restore script and email settings script
-cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
-cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
-chmod 600 /mnt/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
+cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
+cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
+chmod 600 /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
 iocage exec ${JAIL_NAME} sed -i '' "s|mydbpassword|${DB_PASSWORD}|" /usr/NextcloudBR-config
-cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/iocage/jails/${JAIL_NAME}/root/usr/email.sh
+cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/email.sh
 echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
 
 # Don't need /mnt/configs any more, so unmount it
