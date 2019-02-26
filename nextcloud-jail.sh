@@ -251,11 +251,9 @@ iocage exec ${JAIL_NAME} echo "Nextcloud Administrator password is ${ADMIN_PASSW
 chmod 600 /root/${JAIL_NAME}_db_password.txt
 
 # If standalone mode was used to issue certificate, reissue using webroot
-#if [ $STANDALONE_CERT -eq 1 ]; then
-#  iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" -d ${HOST_NAME} -w /usr/local/www/apache24/data -k 4096 --fullchain-file /usr/local/etc/pki/tls/certs/fullchain.pem --key-file /usr/local/etc/pki/tls/private/privkey.pem --reloadcmd "service apache24 reload"
-#iocage exec ${JAIL_NAME} /root/.acme.sh/acme.sh --issue ${TEST_CERT} --home "/root/.acme.sh" -d ${HOST_NAME} -w /usr/local/www -k 4096 --fullchain-file /usr/local/etc/fullchain.pem --key-file /usr/local/etc/pki/tls/private/privkey.pem --reloadcmd "service nginx reload"
-
-#fi
+if [ $STANDALONE_CERT -eq 1 ]; then
+  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+fi
 
 iocage exec ${JAIL_NAME} service nginx restart
 
