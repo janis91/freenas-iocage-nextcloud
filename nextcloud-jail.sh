@@ -214,7 +214,7 @@ iocage exec ${JAIL_NAME} cp -f /usr/local/share/mysql/my-small.cnf /var/db/mysql
 iocage exec ${JAIL_NAME} sed -i '' "s/yourhostnamehere/${HOST_NAME}/" /usr/local/etc/nginx/nginx.conf
 iocage exec ${JAIL_NAME} sed -i '' "s/youripaddress/${JAIL_IP}/" /usr/local/etc/nginx/nginx.conf
 #iocage exec ${JAIL_NAME} sed -i '' "s/#skip-networking/skip-networking/" /var/db/mysql/my.cnf
-#iocage exec ${JAIL_NAME} sed -i '' "s|mytimezone|${TIME_ZONE}|" /usr/local/etc/php.ini
+iocage exec ${JAIL_NAME} sed -i '' "s|mytimezone|${TIME_ZONE}|" /usr/local/etc/php.ini
 #iocage exec ${JAIL_NAME} openssl dhparam -out /usr/local/etc/pki/tls/private/dhparams_4096.pem 4096
 iocage restart ${JAIL_NAME}
 
@@ -250,7 +250,7 @@ chmod 600 /root/${JAIL_NAME}_db_password.txt
 
 # If standalone mode was used to issue certificate, reissue using webroot
 if [ $STANDALONE_CERT -eq 1 ]; then
-  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 fi
 
 iocage exec ${JAIL_NAME} service nginx restart
