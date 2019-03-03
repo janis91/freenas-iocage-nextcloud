@@ -162,7 +162,6 @@ chown -R 80:80 ${FILES_PATH}
 mkdir -p ${PORTS_PATH}/ports
 mkdir -p ${PORTS_PATH}/db
 mkdir -p ${POOL_PATH}/media
-mkdir -p ${POOL_PATH}/NextcloudBackups
 iocage exec ${JAIL_NAME} mkdir -p /mnt/files
 iocage exec ${JAIL_NAME} mkdir -p /var/db/mysql
 iocage exec ${JAIL_NAME} mkdir -p /mnt/configs
@@ -172,7 +171,6 @@ iocage fstab -a ${JAIL_NAME} ${FILES_PATH} /mnt/files nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${DB_PATH} /var/db/mysql  nullfs  rw  0  0
 iocage fstab -a ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
 iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/media /mnt/media nullfs rw 0 0
-iocage fstab -a ${JAIL_NAME} ${POOL_PATH}/NextcloudBackups /mnt/NextcloudBackups nullfs rw 0 0
 iocage exec ${JAIL_NAME} chown -R www:www /mnt/files
 iocage exec ${JAIL_NAME} chmod -R 770 /mnt/files
 #iocage exec ${JAIL_NAME} "if [ -z /usr/ports ]; then portsnap fetch extract; else portsnap auto; fi"
@@ -305,18 +303,6 @@ iocage restart ${JAIL_NAME}
 #
 # Add Video previews
 iocage exec ${JAIL_NAME} pkg install -y ffmpeg
-
-
-echo
-echo
-echo
-# copy backup and restore script and email settings script
-cp -f /git/freenas-iocage-nextcloud/NextcloudBR.sh /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR.sh
-cp -f /git/freenas-iocage-nextcloud/NextcloudBR-config /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
-chmod 600 /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/NextcloudBR-config
-iocage exec ${JAIL_NAME} sed -i '' "s|mydbpassword|${DB_PASSWORD}|" /usr/NextcloudBR-config
-cp -f /git/freenas-iocage-nextcloud/email.sh /mnt/v1/iocage/jails/${JAIL_NAME}/root/usr/email.sh
-echo "Backup and Restore scripts copied to /usr directory in the jail ${JAIL_NAME}"
 
 # Don't need /mnt/configs any more, so unmount it
 iocage fstab -r ${JAIL_NAME} ${CONFIGS_PATH} /mnt/configs nullfs rw 0 0
