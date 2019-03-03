@@ -1,2 +1,1 @@
-45 3 * * * /usr/NextcloudBR.sh
 7 5 * * * certbot renew
