@@ -261,7 +261,8 @@ iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:s
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set redis port --value=0 --type=integer'
 iocage exec ${JAIL_NAME} su -m www -c 'php /usr/local/www/nextcloud/occ config:system:set memcache.locking --value="\OC\Memcache\Redis"'
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 1 --value=\"${HOST_NAME}\""
-iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"${JAIL_IP}\""
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 2 --value=\"www.${HOST_NAME}\""
+iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ config:system:set trusted_domains 3 --value=\"${JAIL_IP}\""
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ app:enable encryption"
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:enable"
 iocage exec ${JAIL_NAME} su -m www -c "php /usr/local/www/nextcloud/occ encryption:disable"
