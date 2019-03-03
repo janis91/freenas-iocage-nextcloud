@@ -223,9 +223,9 @@ if [ $NO_SSL = "yes" ]; then
 else
    #iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 	if [ TYPE_CERT = "--webroot" ]; then
-            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME}
 	else
-            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME}
 	fi
    echo "certbot done"
 fi
@@ -250,7 +250,7 @@ chmod 600 /root/${JAIL_NAME}_db_password.txt
 
 # If standalone mode was used to issue certificate, reissue using webroot
 if [ $STANDALONE_CERT -eq 1 ]; then
-  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME}
 fi
 
 iocage exec ${JAIL_NAME} service nginx restart
