@@ -223,9 +223,9 @@ if [ $NO_SSL = "yes" ]; then
 else
    #iocage exec ${JAIL_NAME} -- certbot certonly --debug --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 	if [ TYPE_CERT = "--webroot" ]; then
-            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 	else
-            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
+            iocage exec ${JAIL_NAME} -- certbot certonly ${TEST_CERT} --standalone -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME} --no-eff-email
 	fi
    echo "certbot done"
 fi
