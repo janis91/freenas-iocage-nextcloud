@@ -250,7 +250,7 @@ chmod 600 /root/${JAIL_NAME}_db_password.txt
 
 # If standalone mode was used to issue certificate, reissue using webroot
 if [ $STANDALONE_CERT -eq 1 ]; then
-  certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME}
+  iocage exec ${JAIL_NAME} certbot certonly --webroot -w /usr/local/www -d ${HOST_NAME} -d www.${HOST_NAME} --agree-tos -m ${EMAIL_NAME}
 fi
 
 iocage exec ${JAIL_NAME} service nginx restart
